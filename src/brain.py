@@ -32,10 +32,12 @@ class Agent:
             self.cash -= self.data[-1].close * self.pending_order.size
             self.equity += self.data[-1].close * self.pending_order.size
             self.position = Position(self.pending_order.size, self.pending_order.date)
+            self.pending_order = None
         elif self.pending_order.typ == "SELL":
-            self.cash -= self.data[-1].close * self.pending_order.size
-            self.equity += self.data[-1].close * self.pending_order.size
+            self.cash += self.data[-1].close * self.pending_order.size
+            self.equity -= self.data[-1].close * self.pending_order.size
             self.position = None
+            self.pending_order = None
 
     def stream(self, point):
         self.data.append(point)
@@ -73,11 +75,11 @@ class Strategy(ABC):
     def next(self):
         pass
 
-    def buy(self, size=100):
+    def buy(self, size=5):
         order = Order(size, self.data[-1].date, typ="BUY")
         self.agent.buy(order)
 
-    def sell(self, size=100):
+    def sell(self, size=5):
         order = Order(size, self.data[-1].date, typ="SELL")
         self.agent.sell(order)
 
